@@ -23,7 +23,7 @@ const PREC = Object.assign(C.PREC, {
 const FOLD_OPERATORS = [
   '+', '-', '*', '/', '%',
   '^', '&', '|',
-  '=', '<', '>',
+  '=', '<-', '<', '>',
   '<<', '>>',
   '+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=',
   '>>=', '<<=',
@@ -304,7 +304,7 @@ module.exports = grammar(C, {
     optional_type_parameter_declaration: $ => seq(
       choice('typename', 'class'),
       optional(field('name', $._type_identifier)),
-      '=',
+      $._assign,
       field('default_type', $._type_specifier),
     ),
 
@@ -332,7 +332,7 @@ module.exports = grammar(C, {
     optional_parameter_declaration: $ => seq(
       $._declaration_specifiers,
       field('declarator', optional($._declarator)),
-      '=',
+      $._assign,
       field('default_value', $._expression),
     ),
 
@@ -354,8 +354,12 @@ module.exports = grammar(C, {
       $.variadic_declarator,
     ),
 
-    init_declarator: ($, original) => choice(
-      original,
+    init_declarator: $ => choice(
+      seq(
+        field('declarator', $._declarator),
+        $._assign,
+        field('value', choice($.initializer_list, $._expression)),
+      ),
       seq(
         field('declarator', $._declarator),
         field('value', choice(
@@ -412,9 +416,14 @@ module.exports = grammar(C, {
       optional(choice(
         $.bitfield_clause,
         field('default_value', $.initializer_list),
-        seq('=', field('default_value', choice($._expression, $.initializer_list))),
+        seq($._assign, field('default_value', choice($._expression, $.initializer_list))),
       )),
       ';',
+    ),
+
+    enumerator: $ => seq(
+      field('name', $.identifier),
+      optional(seq($._assign, field('value', $._expression))),
     ),
 
     inline_method_definition: $ => seq(
@@ -447,7 +456,7 @@ module.exports = grammar(C, {
         $.operator_cast,
         alias($.qualified_operator_cast_identifier, $.qualified_identifier),
       )),
-      optional(seq('=', field('default_value', $._expression))),
+      optional(seq($._assign, field('default_value', $._expression))),
       ';',
     )),
 
@@ -478,8 +487,8 @@ module.exports = grammar(C, {
       ';',
     ),
 
-    default_method_clause: _ => seq('=', 'default', ';'),
-    delete_method_clause: _ => seq('=', 'delete', ';'),
+    default_method_clause: $ => seq($._assign, 'default', ';'),
+    delete_method_clause: $ => seq($._assign, 'delete', ';'),
 
     friend_declaration: $ => seq(
       'friend',
@@ -628,7 +637,7 @@ module.exports = grammar(C, {
     namespace_alias_definition: $ => seq(
       'namespace',
       field('name', $._namespace_identifier),
-      '=',
+      $._assign,
       choice(
         $._namespace_identifier,
         $.nested_namespace_specifier,
@@ -664,7 +673,7 @@ module.exports = grammar(C, {
       'using',
       field('name', $._type_identifier),
       repeat($.attribute_declaration),
-      '=',
+      $._assign,
       field('type', $.type_descriptor),
       ';',
     ),
@@ -688,15 +697,32 @@ module.exports = grammar(C, {
     concept_definition: $ => seq(
       'concept',
       field('name', $.identifier),
-      '=',
+      $._assign,
       $._expression,
       ';',
     ),
 
     // Statements
 
-    _non_case_statement: ($, original) => choice(
-      original,
+    _statement: $ => choice(
+      $.case_statement,
+      $._non_case_statement,
+      ),
+    
+    _non_case_statement: $ => choice(
+      $.attributed_statement,
+      $.labeled_statement,
+      $.compound_statement,
+      $.expression_statement,
+      $.if_statement,
+      $.switch_statement,
+      $.do_statement,
+      $.while_statement,
+      $.for_statement,
+      $.return_statement,
+      $.break_statement,
+      $.continue_statement,
+      $.goto_statement,
       $.co_return_statement,
       $.co_yield_statement,
       $.for_range_loop,
@@ -765,7 +791,7 @@ module.exports = grammar(C, {
       field('declarator', $._declarator),
       choice(
         seq(
-          '=',
+          $._assign,
           field('value', $._expression),
         ),
         field('value', $.initializer_list),
@@ -786,7 +812,7 @@ module.exports = grammar(C, {
     ),
 
     co_yield_statement: $ => seq(
-      'co_yield',
+      $._yield,
       $._expression,
       ';',
     ),
@@ -811,8 +837,28 @@ module.exports = grammar(C, {
 
     // Expressions
 
-    _expression: ($, original) => choice(
-      original,
+    _expression: $ => choice(
+      $.conditional_expression,
+      $.assignment_expression,
+      $.binary_expression,
+      $.unary_expression,
+      $.update_expression,
+      $.cast_expression,
+      $.pointer_expression,
+      $.sizeof_expression,
+      $.subscript_expression,
+      $.call_expression,
+      $.field_expression,
+      $.compound_literal_expression,
+      $.identifier,
+      $.number_literal,
+      $.string_literal,
+      $.true,
+      $.false,
+      $.null,
+      $.concatenated_string,
+      $.char_literal,
+      $.parenthesized_expression,
       $.co_await_expression,
       $.requires_expression,
       $.requires_clause,
@@ -861,7 +907,7 @@ module.exports = grammar(C, {
     )),
 
     co_await_expression: $ => prec.left(PREC.UNARY, seq(
-      field('operator', 'co_await'),
+      field('operator', $._await),
       field('argument', $._expression),
     )),
 
@@ -894,9 +940,10 @@ module.exports = grammar(C, {
     field_expression: ($, original) => choice(
       original,
       seq(
-        prec(PREC.FIELD, seq(
+        prec.left(PREC.FIELD, seq(
           field('argument', $._expression),
           choice('.', '->'),
+          optional('*')
         )),
         field('field', choice(
           $.destructor_name,
@@ -1153,26 +1200,40 @@ module.exports = grammar(C, {
       $.qualified_identifier,
     ),
 
-    assignment_expression: ($, original) => choice(
-      original,
-      prec.right(PREC.ASSIGNMENT, seq(
-        field('left', $._assignment_left_expression),
-        field('operator', choice(
-          'and_eq',
-          'or_eq',
-          'xor_eq',
-        )),
-        field('right', $._expression),
+    assignment_expression: $ => prec.right(PREC.ASSIGNMENT, seq(
+      field('left', $._assignment_left_expression),
+      field('operator', choice(
+        $._assign,
+        '*=',
+        '/=',
+        '%=',
+        '+=',
+        '-=',
+        '<<=',
+        '>>=',
+        '&=',
+        '^=',
+        '|=',
+        'and_eq',
+        'or_eq',
+        'xor_eq',
       )),
+      field('right', $._expression),
+    )),
+
+    initializer_pair: $ => seq(
+      field('designator', repeat1(choice($.subscript_designator, $.field_designator))),
+      $._assign,
+      field('value', choice($._expression, $.initializer_list)),
     ),
 
     operator_name: $ => prec(1, seq(
       'operator',
       choice(
-        'co_await',
+        $._await,
         '+', '-', '*', '/', '%',
         '^', '&', '|', '~',
-        '!', '=', '<', '>',
+        '!', $._assign, '<', '>',
         '+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=',
         '<<', '>>', '>>=', '<<=',
         '==', '!=', '<=', '>=',
@@ -1180,8 +1241,7 @@ module.exports = grammar(C, {
         '&&', '||',
         '++', '--',
         ',',
-        '->*',
-        '->',
+        '->', '->*',
         '()', '[]',
         'xor', 'bitand', 'bitor', 'compl',
         'not', 'xor_eq', 'and_eq', 'or_eq', 'not_eq',
@@ -1213,6 +1273,13 @@ module.exports = grammar(C, {
     ),
 
     _namespace_identifier: $ => alias($.identifier, $.namespace_identifier),
+
+    _assign: _ => choice('=', /*'eq',*/ '<-'),
+    // _arrow: _ => prec.left(choice('->', '*.')),
+    // _arrow_star: _ => prec.left(1, choice('->*', '*.*')),
+
+    _yield: _ => choice('co_yield', 'yield'),
+    _await: _ => choice('co_await', 'await'),
   },
 });
 

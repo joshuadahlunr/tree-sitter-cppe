@@ -776,6 +776,10 @@
             "named": false
           },
           {
+            "type": "<-",
+            "named": false
+          },
+          {
             "type": "<<=",
             "named": false
           },
@@ -1401,6 +1405,10 @@
         "multiple": false,
         "required": true,
         "types": [
+          {
+            "type": "await",
+            "named": false
+          },
           {
             "type": "co_await",
             "named": false
@@ -2696,6 +2704,10 @@
           },
           {
             "type": "<",
+            "named": false
+          },
+          {
+            "type": "<-",
             "named": false
           },
           {
@@ -6362,6 +6374,10 @@
     "named": false
   },
   {
+    "type": "<-",
+    "named": false
+  },
+  {
     "type": "<<",
     "named": false
   },
@@ -6520,6 +6536,10 @@
   {
     "type": "auto",
     "named": true
+  },
+  {
+    "type": "await",
+    "named": false
   },
   {
     "type": "bitand",
@@ -6915,6 +6935,10 @@
   },
   {
     "type": "xor_eq",
+    "named": false
+  },
+  {
+    "type": "yield",
     "named": false
   },
   {

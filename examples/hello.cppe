@@ -1,0 +1,8 @@
+
+auto main() -> int {
+	std::vector<const std::string_view> worlds <- {"world", "世界"};
+
+	for(auto w: worlds)
+		std::cout << w << "\n";
+	std::cout << std::flush;
+}
