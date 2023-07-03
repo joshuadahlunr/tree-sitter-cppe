@@ -1,6 +1,7 @@
 /**
- * @file C++ grammar for tree-sitter
- * @author Max Brunsfeld
+ * @file CPPE grammar for tree-sitter (Modified from the c++ grammar)
+ * @author Joshua Dahl
+ * @originalauthor Max Brunsfeld
  * @license MIT
  */
 
@@ -34,7 +35,7 @@ const FOLD_OPERATORS = [
 ];
 
 module.exports = grammar(C, {
-  name: 'cpp',
+  name: 'cppe',
 
   externals: $ => [
     $.raw_string_delimiter,

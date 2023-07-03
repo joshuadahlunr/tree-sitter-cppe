@@ -1,7 +1,7 @@
 {
-  "name": "tree-sitter-cpp",
-  "version": "0.20.0",
-  "description": "C++ grammar for tree-sitter",
+  "name": "tree-sitter-cppe",
+  "version": "0.0.1",
+  "description": "CPPE grammar for tree-sitter",
   "main": "bindings/node",
   "keywords": [
     "parser",
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "https://github.com/tree-sitter/tree-sitter-cpp.git"
   },
-  "author": "Max Brunsfeld",
+  "author": "Joshua Dahl",
   "license": "MIT",
   "dependencies": {
     "nan": "^2.14.0"
@@ -32,17 +32,16 @@
     {
       "scope": "source.cpp",
       "file-types": [
-        "cc",
-        "cpp",
-        "hpp",
-        "h"
+        "cppe",
+        "hppe",
+        "he"
       ],
       "highlights": [
         "queries/highlights.scm",
         "node_modules/tree-sitter-c/queries/highlights.scm"
       ],
       "injections": "queries/injections.scm",
-      "injection-regex": "^(cc|cpp)$"
+      "injection-regex": "^(cc|cppe)$"
     }
   ]
 }

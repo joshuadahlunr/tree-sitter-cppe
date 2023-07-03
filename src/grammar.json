@@ -1,5 +1,5 @@
 {
-  "name": "cpp",
+  "name": "cppe",
   "word": "identifier",
   "rules": {
     "translation_unit": {

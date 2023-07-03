@@ -1,4 +1,4 @@
-tree-sitter-cpp
+tree-sitter-cppe
 ==================
 
 [![Build Status](https://travis-ci.org/tree-sitter/tree-sitter-cpp.svg?branch=master)](https://travis-ci.org/tree-sitter/tree-sitter-cpp)

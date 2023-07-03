@@ -111,20 +111,20 @@ static inline bool scan(Scanner *scanner, TSLexer *lexer,
     return false;
 }
 
-void *tree_sitter_cpp_external_scanner_create() {
+void *tree_sitter_cppe_external_scanner_create() {
     Scanner *scanner = (Scanner *)calloc(1, sizeof(Scanner));
     memset(scanner, 0, sizeof(Scanner));
     return scanner;
 }
 
-bool tree_sitter_cpp_external_scanner_scan(void *payload, TSLexer *lexer,
+bool tree_sitter_cppe_external_scanner_scan(void *payload, TSLexer *lexer,
                                            const bool *valid_symbols) {
     Scanner *scanner = (Scanner *)payload;
 
     return scan(scanner, lexer, valid_symbols);
 }
 
-unsigned tree_sitter_cpp_external_scanner_serialize(void *payload,
+unsigned tree_sitter_cppe_external_scanner_serialize(void *payload,
                                                     char *buffer) {
     assert(RAW_STRING_DELIMITER_MAX * sizeof(wchar_t) <
                TREE_SITTER_SERIALIZATION_BUFFER_SIZE &&
@@ -135,7 +135,7 @@ unsigned tree_sitter_cpp_external_scanner_serialize(void *payload,
     return (unsigned)size;
 }
 
-void tree_sitter_cpp_external_scanner_deserialize(void *payload,
+void tree_sitter_cppe_external_scanner_deserialize(void *payload,
                                                   const char *buffer,
                                                   unsigned length) {
     assert(length % sizeof(wchar_t) == 0 &&
@@ -146,7 +146,7 @@ void tree_sitter_cpp_external_scanner_deserialize(void *payload,
     memcpy(&scanner->delimiter[0], buffer, length);
 }
 
-void tree_sitter_cpp_external_scanner_destroy(void *payload) {
+void tree_sitter_cppe_external_scanner_destroy(void *payload) {
     Scanner *scanner = (Scanner *)payload;
     free(scanner);
 }
