@@ -1,12 +1,17 @@
-#define fn auto
 
-fn main(std::vector<std::string_view> args) -> int {
-	std::vector<const std::string_view> worlds <- {"world", "世界"};
-	// defer std::vector<const std::string_view>::~vector(worlds);
-	// defer if(not worlds.empty()) 
-	//	worlds.clear();
+fn main(std::vector<std::string> args) {
+	for(auto& arg: args)
+        std::cout << "arg: " << arg << std::endl;
 
-	for(auto w in worlds)
+	std::vector<std::string_view> worlds <- {"world", "世界"};
+	defer if(not worlds.empty()) 
+			worlds.clear();
+		else if(worlds.empty()) {}
+
+	for(int x = 0; x < 7; x++) 
+		std::cout << x << std::endl;
+
+	foreach(auto w in worlds)
 		std::cout << w << "\n";
 	std::cout << std::flush;
 
@@ -16,19 +21,43 @@ fn main(std::vector<std::string_view> args) -> int {
 			5
 		}
 	};// == std::vector<std::vector<int>> x = {}
+	std::cout << "x.size() = " << x.size() << std::endl;
 
-	auto x = {
+	outer: for(size_t x = 2; x--;)
+		inner: for(size_t y = 2; y--;)
+			std::cout << x << ", " << y << std::endl;
+ 
+	auto y = try {
 		std::cout << "This is a nested print" << std::endl;
+		yield 5;
+		return 5;
 		5
+	} catch(std::exception& e) {
+		std::cout << e.what() << std::endl;
+		-1
 	};
 
-	auto y = switch(x){
+	try {
+		std::cout << "This is a nested print" << std::endl;
+		yield 5;
+		return 5;
+		5
+	} catch(std::exception& e) {
+		std::cout << e.what() << std::endl;
+	};
+
+	auto z = switch(y){
+		case 1:
+		case 2:
+		case 3:
 		case 5 => 4;
 		case 4 => 5;
 		default: break;
 	};
 
 	auto f = ([] => (int)5;);
+
+	0
 }
 
-size_t f() => 5;
+std::tuple<int, int> f() => {1, 2}

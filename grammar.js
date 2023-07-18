@@ -732,6 +732,7 @@ module.exports = grammar(C, {
       $.while_statement,
       $.for_statement,
       $.return_statement,
+      $.yield_statement,
       $.break_statement,
       $.continue_statement,
       $.goto_statement,
@@ -875,11 +876,16 @@ module.exports = grammar(C, {
       ';',
     ),
 
-    return_statement: ($, original) => seq(
-      choice(
-        original,
-        seq('return', $.initializer_list, ';'),
-      ),
+    return_statement: $ => seq(
+      'return',
+      optional(choice($._expression, $.comma_expression, $.initializer_list)),
+      ';',
+    ),
+
+    yield_statement: $ => seq(
+      'yield',
+      optional(choice($._expression, $.comma_expression, $.initializer_list)),
+      ';',
     ),
 
     co_return_statement: $ => seq(
@@ -889,7 +895,7 @@ module.exports = grammar(C, {
     ),
 
     co_yield_statement: $ => seq(
-      $._yield,
+      "co_yield",
       $._expression,
       ';',
     ),
@@ -1372,7 +1378,6 @@ module.exports = grammar(C, {
     // _arrow: _ => prec.left(choice('->', '*.')),
     // _arrow_star: _ => prec.left(1, choice('->*', '*.*')),
 
-    _yield: _ => choice('co_yield', 'yield'),
     _await: _ => choice('co_await', 'await'),
   },
 });
