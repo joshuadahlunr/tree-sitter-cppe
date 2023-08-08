@@ -18,7 +18,7 @@ const PREC = Object.assign(C.PREC, {
   NEW: C.PREC.CALL + 1,
   STRUCTURED_BINDING: -1,
   THREE_WAY: C.PREC.RELATIONAL + 1,
-  LABELED: -3
+  LABELED: C.PREC.ASSIGNMENT - 2,
 });
 
 const FOLD_OPERATORS = [
@@ -177,8 +177,13 @@ module.exports = grammar(C, {
       members: original.members.map(
         (e) => e.name !== 'body' ?
           e :
-          field('body', choice(e.content, $.try_statement))),
+          field('body', choice(
+            $.compound_expression, // Allow implicit returns! 
+            $.try_statement,
+            $.expression_body,
+          ))),
     }),
+    expression_body: $ => seq('=>', choice($.initializer_list, $._control_body)),
 
     virtual_specifier: _ => choice(
       'final', // the only legal value here for classes
@@ -382,7 +387,7 @@ module.exports = grammar(C, {
     compound_expression: $ => prec(-1, seq(
       '{',
       repeat($._top_level_item),
-      optional(field("return", $._expression)),
+      optional(field("return", choice($.initializer_list, $._expression))),
       '}',
     )),
 
@@ -437,7 +442,7 @@ module.exports = grammar(C, {
       $._declaration_specifiers,
       field('declarator', $._field_declarator),
       choice(
-        field('body', choice($.compound_statement, $.try_statement)),
+        field('body', choice($.compound_expression, $.try_statement, $.expression_body)),
         $.default_method_clause,
         $.delete_method_clause,
       ),
@@ -454,7 +459,7 @@ module.exports = grammar(C, {
         $.operator_cast,
         alias($.qualified_operator_cast_identifier, $.qualified_identifier),
       )),
-      field('body', choice($.compound_statement, $.try_statement)),
+      field('body', choice($.compound_expression, $.try_statement, $.expression_body)),
     ),
 
     operator_cast_declaration: $ => prec(1, seq(
@@ -757,7 +762,7 @@ module.exports = grammar(C, {
             $.type_definition,
           ))
         ),
-        field('expression', seq('=>', $.compound_expression)),
+        field('expression', $.expression_body),
       ),
     )),
 
@@ -1115,7 +1120,7 @@ module.exports = grammar(C, {
         optional(field('constraint', $.requires_clause)),
       )),
       optional(field('declarator', $.abstract_function_declarator)),
-      field('body', $.compound_statement),
+      field('body', choice($.compound_expression, $.expression_body))
     ),
 
     lambda_capture_specifier: $ => prec(PREC.LAMBDA, seq(

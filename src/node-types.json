@@ -1218,15 +1218,11 @@
     "named": true,
     "fields": {
       "expression": {
-        "multiple": true,
+        "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "=>",
-            "named": false
-          },
-          {
-            "type": "compound_expression",
+            "type": "expression_body",
             "named": true
           }
         ]
@@ -2556,6 +2552,36 @@
     }
   },
   {
+    "type": "expression_body",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "_statement",
+          "named": true
+        },
+        {
+          "type": "compound_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "expression_statement",
     "named": true,
     "fields": {},
@@ -3340,7 +3366,15 @@
         "required": false,
         "types": [
           {
+            "type": "compound_expression",
+            "named": true
+          },
+          {
             "type": "compound_statement",
+            "named": true
+          },
+          {
+            "type": "expression_body",
             "named": true
           },
           {
@@ -3722,7 +3756,11 @@
         "required": true,
         "types": [
           {
-            "type": "compound_statement",
+            "type": "compound_expression",
+            "named": true
+          },
+          {
+            "type": "expression_body",
             "named": true
           }
         ]
@@ -7021,6 +7059,10 @@
   },
   {
     "type": "for",
+    "named": false
+  },
+  {
+    "type": "foreach",
     "named": false
   },
   {

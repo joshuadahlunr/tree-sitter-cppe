@@ -1,8 +1,10 @@
+#define fn auto
 
-auto main() -> int {
+fn main(std::vector<std::string_view> args) -> int {
 	std::vector<const std::string_view> worlds <- {"world", "世界"};
 	// defer std::vector<const std::string_view>::~vector(worlds);
-	defer if(not worlds.empty()) worlds.clear();
+	// defer if(not worlds.empty()) 
+	//	worlds.clear();
 
 	for(auto w in worlds)
 		std::cout << w << "\n";
@@ -21,8 +23,12 @@ auto main() -> int {
 	};
 
 	auto y = switch(x){
-		case 5 => { 5 }
-		case 4 => { 4 }
+		case 5 => 4;
+		case 4 => 5;
 		default: break;
 	};
+
+	auto f = ([] => (int)5;);
 }
+
+size_t f() => 5;
