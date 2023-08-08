@@ -18,6 +18,7 @@ const PREC = Object.assign(C.PREC, {
   NEW: C.PREC.CALL + 1,
   STRUCTURED_BINDING: -1,
   THREE_WAY: C.PREC.RELATIONAL + 1,
+  LABELED: -3
 });
 
 const FOLD_OPERATORS = [
@@ -123,10 +124,10 @@ module.exports = grammar(C, {
       )),
     ),
 
-    type_qualifier: (_, original) => choice(
+    type_qualifier: ($, original) => choice(
       original,
       'mutable',
-      'constexpr',
+      $._constexpr,
       'constinit',
       'consteval',
     ),
@@ -377,7 +378,13 @@ module.exports = grammar(C, {
 
     // Avoid ambiguity between compound statement and initializer list in a construct like:
     //   A b {};
-    compound_statement: (_, original) => prec(-1, original),
+    compound_statement: (_, original) => prec(-2, original),
+    compound_expression: $ => prec(-1, seq(
+      '{',
+      repeat($._top_level_item),
+      optional(field("return", $._expression)),
+      '}',
+    )),
 
     field_initializer_list: $ => seq(
       ':',
@@ -708,7 +715,7 @@ module.exports = grammar(C, {
       $.case_statement,
       $._non_case_statement,
       ),
-    
+
     _non_case_statement: $ => choice(
       $.attributed_statement,
       $.labeled_statement,
@@ -728,45 +735,93 @@ module.exports = grammar(C, {
       $.for_range_loop,
       $.try_statement,
       $.throw_statement,
+      $.defer_statement,
     ),
 
     switch_statement: $ => seq(
       'switch',
       field('condition', $.condition_clause),
-      field('body', $.compound_statement),
+      field('body', $.compound_statement), // TODO: Should this be more narrowly defined?
+    ),
+    _switch_expression: $ => prec(-1, $.switch_statement),
+
+    case_statement: $ => prec.right(seq(
+      choice(
+        seq('case', field('value', $._expression)),
+        'default',
+      ),
+      choice(
+        seq(':', repeat(choice(
+            $._non_case_statement,
+            $.declaration,
+            $.type_definition,
+          ))
+        ),
+        field('expression', seq('=>', $.compound_expression)),
+      ),
+    )),
+
+    _control_body: $ => choice(
+      prec(1, $.compound_expression),
+      prec.left(-10, $.possibly_labeled_control_flow_expression),
+      prec(-12, $._statement)
     ),
 
     while_statement: $ => seq(
       'while',
       field('condition', $.condition_clause),
-      field('body', $._statement),
+      field('body', $._control_body),
     ),
+
+    do_statement: $ => seq(
+      'do',
+      field('body', $._control_body),
+      'while',
+      field('condition', $.parenthesized_expression),
+      ';',
+    ),
+    _while_expression: $ => prec(1, choice($.while_statement, $.do_statement)),
 
     if_statement: $ => prec.right(seq(
       'if',
-      optional('constexpr'),
+      optional($._constexpr),
       field('condition', $.condition_clause),
-      field('consequence', $._statement),
+      field('consequence', $._control_body),
       optional(seq(
         'else',
-        field('alternative', $._statement),
+        field('alternative', $._control_body),
       )),
     )),
+    _if_expression: $ => prec(1, $.if_statement),
+
+    for_statement: $ => seq(
+      'for',
+      '(',
+      choice(
+        field('initializer', $.declaration),
+        seq(field('initializer', optional(choice($._expression, $.comma_expression))), ';'),
+      ),
+      field('condition', optional(choice($._expression, $.comma_expression))), ';',
+      field('update', optional(choice($._expression, $.comma_expression))),
+      ')',
+      field('body', $._control_body),
+    ),
 
     for_range_loop: $ => seq(
-      'for',
+      choice('for', 'foreach'),
       '(',
       field('initializer', optional($.init_statement)),
       $._declaration_specifiers,
       field('declarator', $._declarator),
-      ':',
+      choice(':', 'in'),
       field('right', choice(
         $._expression,
         $.initializer_list,
       )),
       ')',
-      field('body', $._statement),
+      field('body', $._control_body),
     ),
+    _for_expression: $ => prec(1, choice($.for_statement, $.for_range_loop)),
 
     init_statement: $ => choice(
       $.alias_declaration,
@@ -798,6 +853,23 @@ module.exports = grammar(C, {
       ),
     ),
 
+    defer_statement: $ => seq(
+      'defer',
+      field('body', $._statement),
+    ),
+
+    break_statement: $ => seq(
+      'break',
+      optional(field('label', $._statement_identifier)),
+      ';',
+    ),
+
+    continue_statement: $ => seq(
+      'continue',
+      optional(field('label', $._statement_identifier)),
+      ';',
+    ),
+
     return_statement: ($, original) => seq(
       choice(
         original,
@@ -825,19 +897,23 @@ module.exports = grammar(C, {
 
     try_statement: $ => seq(
       'try',
-      field('body', $.compound_statement),
+      field('body', $.compound_expression),
       repeat1($.catch_clause),
     ),
+    _try_expression: $ => prec(1, $.try_statement),
 
     catch_clause: $ => seq(
       'catch',
       field('parameters', $.parameter_list),
-      field('body', $.compound_statement),
+      field('body', $.compound_expression),
     ),
 
     // Expressions
 
     _expression: $ => choice(
+      $.compound_expression,
+      $.labeled_expression,
+      $._control_flow_expression,
       $.conditional_expression,
       $.assignment_expression,
       $.binary_expression,
@@ -874,6 +950,18 @@ module.exports = grammar(C, {
       $.user_defined_literal,
       $.fold_expression,
     ),
+
+    labeled_expression: $ => prec(PREC.LABELED, seq(
+      field('label', $._statement_identifier),
+      ':',
+      $._expression,
+    )),
+
+    _control_flow_expression: $ => prec(PREC.ASSIGNMENT, choice($._if_expression, $._switch_expression, $._while_expression, $._for_expression, $._try_expression)),
+    possibly_labeled_control_flow_expression: $ => prec(PREC.LABELED, seq(
+      optional(seq(field('label', $._statement_identifier),':')),
+      $._control_flow_expression,
+    )),
 
     raw_string_literal: $ => seq(
       choice('R"', 'LR"', 'uR"', 'UR"', 'u8R"'),
@@ -1275,6 +1363,7 @@ module.exports = grammar(C, {
     _namespace_identifier: $ => alias($.identifier, $.namespace_identifier),
 
     _assign: _ => choice('=', /*'eq',*/ '<-'),
+    _constexpr: _ => choice('constexpr', 'comptime'),
     // _arrow: _ => prec.left(choice('->', '*.')),
     // _arrow_star: _ => prec.left(1, choice('->*', '*.*')),
 

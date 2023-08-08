@@ -108,6 +108,10 @@
         "named": true
       },
       {
+        "type": "compound_expression",
+        "named": true
+      },
+      {
         "type": "compound_literal_expression",
         "named": true
       },
@@ -124,6 +128,10 @@
         "named": true
       },
       {
+        "type": "do_statement",
+        "named": true
+      },
+      {
         "type": "false",
         "named": true
       },
@@ -136,7 +144,23 @@
         "named": true
       },
       {
+        "type": "for_range_loop",
+        "named": true
+      },
+      {
+        "type": "for_statement",
+        "named": true
+      },
+      {
         "type": "identifier",
+        "named": true
+      },
+      {
+        "type": "if_statement",
+        "named": true
+      },
+      {
+        "type": "labeled_expression",
         "named": true
       },
       {
@@ -200,6 +224,10 @@
         "named": true
       },
       {
+        "type": "switch_statement",
+        "named": true
+      },
+      {
         "type": "template_function",
         "named": true
       },
@@ -212,6 +240,10 @@
         "named": true
       },
       {
+        "type": "try_statement",
+        "named": true
+      },
+      {
         "type": "unary_expression",
         "named": true
       },
@@ -221,6 +253,10 @@
       },
       {
         "type": "user_defined_literal",
+        "named": true
+      },
+      {
+        "type": "while_statement",
         "named": true
       }
     ]
@@ -297,6 +333,10 @@
       },
       {
         "type": "continue_statement",
+        "named": true
+      },
+      {
+        "type": "defer_statement",
         "named": true
       },
       {
@@ -1130,7 +1170,18 @@
   {
     "type": "break_statement",
     "named": true,
-    "fields": {}
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_identifier",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "call_expression",
@@ -1166,6 +1217,20 @@
     "type": "case_statement",
     "named": true,
     "fields": {
+      "expression": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "=>",
+            "named": false
+          },
+          {
+            "type": "compound_expression",
+            "named": true
+          }
+        ]
+      },
       "value": {
         "multiple": false,
         "required": false,
@@ -1207,6 +1272,10 @@
         },
         {
           "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "defer_statement",
           "named": true
         },
         {
@@ -1475,6 +1544,108 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "compound_expression",
+    "named": true,
+    "fields": {
+      "return": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "_statement",
+          "named": true
+        },
+        {
+          "type": "_type_specifier",
+          "named": true
+        },
+        {
+          "type": "alias_declaration",
+          "named": true
+        },
+        {
+          "type": "concept_definition",
+          "named": true
+        },
+        {
+          "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "function_definition",
+          "named": true
+        },
+        {
+          "type": "linkage_specification",
+          "named": true
+        },
+        {
+          "type": "namespace_alias_definition",
+          "named": true
+        },
+        {
+          "type": "namespace_definition",
+          "named": true
+        },
+        {
+          "type": "preproc_call",
+          "named": true
+        },
+        {
+          "type": "preproc_def",
+          "named": true
+        },
+        {
+          "type": "preproc_function_def",
+          "named": true
+        },
+        {
+          "type": "preproc_if",
+          "named": true
+        },
+        {
+          "type": "preproc_ifdef",
+          "named": true
+        },
+        {
+          "type": "preproc_include",
+          "named": true
+        },
+        {
+          "type": "static_assert_declaration",
+          "named": true
+        },
+        {
+          "type": "template_declaration",
+          "named": true
+        },
+        {
+          "type": "template_instantiation",
+          "named": true
+        },
+        {
+          "type": "type_definition",
+          "named": true
+        },
+        {
+          "type": "using_declaration",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1919,7 +2090,18 @@
   {
     "type": "continue_statement",
     "named": true,
-    "fields": {}
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_identifier",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "declaration",
@@ -2129,6 +2311,22 @@
     "fields": {}
   },
   {
+    "type": "defer_statement",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_statement",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "delete_expression",
     "named": true,
     "fields": {},
@@ -2206,11 +2404,23 @@
     "named": true,
     "fields": {
       "body": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
+            "type": ":",
+            "named": false
+          },
+          {
             "type": "_statement",
+            "named": true
+          },
+          {
+            "type": "compound_expression",
+            "named": true
+          },
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -2221,6 +2431,16 @@
         "types": [
           {
             "type": "parenthesized_expression",
+            "named": true
+          }
+        ]
+      },
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -2813,11 +3033,23 @@
     "named": true,
     "fields": {
       "body": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
+            "type": ":",
+            "named": false
+          },
+          {
             "type": "_statement",
+            "named": true
+          },
+          {
+            "type": "compound_expression",
+            "named": true
+          },
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -2838,6 +3070,16 @@
         "types": [
           {
             "type": "init_statement",
+            "named": true
+          }
+        ]
+      },
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -2903,11 +3145,23 @@
     "named": true,
     "fields": {
       "body": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
+            "type": ":",
+            "named": false
+          },
+          {
             "type": "_statement",
+            "named": true
+          },
+          {
+            "type": "compound_expression",
+            "named": true
+          },
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -2940,6 +3194,16 @@
           },
           {
             "type": "declaration",
+            "named": true
+          }
+        ]
+      },
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -3190,11 +3454,23 @@
     "named": true,
     "fields": {
       "alternative": {
-        "multiple": false,
+        "multiple": true,
         "required": false,
         "types": [
           {
+            "type": ":",
+            "named": false
+          },
+          {
             "type": "_statement",
+            "named": true
+          },
+          {
+            "type": "compound_expression",
+            "named": true
+          },
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -3210,11 +3486,33 @@
         ]
       },
       "consequence": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
+            "type": ":",
+            "named": false
+          },
+          {
             "type": "_statement",
+            "named": true
+          },
+          {
+            "type": "compound_expression",
+            "named": true
+          },
+          {
+            "type": "statement_identifier",
+            "named": true
+          }
+        ]
+      },
+      "label": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -3337,6 +3635,32 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "labeled_expression",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "statement_identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -5753,6 +6077,10 @@
         "required": true,
         "types": [
           {
+            "type": "compound_expression",
+            "named": true
+          },
+          {
             "type": "compound_statement",
             "named": true
           }
@@ -6184,11 +6512,23 @@
     "named": true,
     "fields": {
       "body": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
+            "type": ":",
+            "named": false
+          },
+          {
             "type": "_statement",
+            "named": true
+          },
+          {
+            "type": "compound_expression",
+            "named": true
+          },
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -6199,6 +6539,16 @@
         "types": [
           {
             "type": "condition_clause",
+            "named": true
+          }
+        ]
+      },
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_identifier",
             "named": true
           }
         ]
@@ -6399,6 +6749,10 @@
   },
   {
     "type": "==",
+    "named": false
+  },
+  {
+    "type": "=>",
     "named": false
   },
   {
@@ -6618,6 +6972,10 @@
     "named": false
   },
   {
+    "type": "defer",
+    "named": false
+  },
+  {
     "type": "defined",
     "named": false
   },
@@ -6679,6 +7037,10 @@
   },
   {
     "type": "if",
+    "named": false
+  },
+  {
+    "type": "in",
     "named": false
   },
   {

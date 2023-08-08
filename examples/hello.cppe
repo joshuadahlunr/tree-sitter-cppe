@@ -1,8 +1,28 @@
 
 auto main() -> int {
 	std::vector<const std::string_view> worlds <- {"world", "世界"};
+	// defer std::vector<const std::string_view>::~vector(worlds);
+	defer if(not worlds.empty()) worlds.clear();
 
-	for(auto w: worlds)
+	for(auto w in worlds)
 		std::cout << w << "\n";
 	std::cout << std::flush;
+
+	auto x = outer: while(true) {
+		inner: while(true){
+			break outer;
+			5
+		}
+	};// == std::vector<std::vector<int>> x = {}
+
+	auto x = {
+		std::cout << "This is a nested print" << std::endl;
+		5
+	};
+
+	auto y = switch(x){
+		case 5 => { 5 }
+		case 4 => { 4 }
+		default: break;
+	};
 }
