@@ -57,7 +57,12 @@ fn main(std::vector<std::string> args) {
 
 	auto f = ([] => (int)5;);
 
+
+
+	std::function<void(int)> f2;
+	<void(int)>* fptr;
+
 	0
 }
 
-std::tuple<int, int> f() => {1, 2}
+<int, <int | std::string>> f() => {1, 2}

@@ -64,6 +64,7 @@ module.exports = grammar(C, {
     [$._binary_fold_operator, $._fold_operator],
     [$.expression_statement, $.for_statement],
     [$.init_statement, $.for_statement],
+    [$._declaration_modifiers, $.type_descriptor]
   ]),
 
   inline: ($, original) => original.concat([
@@ -107,7 +108,21 @@ module.exports = grammar(C, {
       ')',
     ),
 
+    sum_type: $ => prec.left(1, seq(
+      $._type_specifier,
+      '|',
+      $._type_specifier
+    )),
+
+    product_type: $ => choice(
+      // seq('(', commaSep1($.type_descriptor), ')'),
+      seq('<', commaSep1($.type_descriptor), '>')
+    ),
+    
+
     _type_specifier: $ => choice(
+      $.sum_type,
+      $.product_type,
       $.struct_specifier,
       $.union_specifier,
       $.enum_specifier,
@@ -132,7 +147,7 @@ module.exports = grammar(C, {
       'consteval',
     ),
 
-    type_descriptor: (_, original) => prec.right(original),
+    type_descriptor: (_, original) => prec.right(1, original),
 
     // When used in a trailing return type, these specifiers can now occur immediately before
     // a compound statement. This introduces a shift/reduce conflict that needs to be resolved

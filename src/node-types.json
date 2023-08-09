@@ -452,6 +452,10 @@
         "named": true
       },
       {
+        "type": "product_type",
+        "named": true
+      },
+      {
         "type": "qualified_identifier",
         "named": true
       },
@@ -461,6 +465,10 @@
       },
       {
         "type": "struct_specifier",
+        "named": true
+      },
+      {
+        "type": "sum_type",
         "named": true
       },
       {
@@ -5181,6 +5189,21 @@
     }
   },
   {
+    "type": "product_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "type_descriptor",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "qualified_identifier",
     "named": true,
     "fields": {
@@ -5661,6 +5684,21 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "sum_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_type_specifier",
+          "named": true
+        }
+      ]
     }
   },
   {
