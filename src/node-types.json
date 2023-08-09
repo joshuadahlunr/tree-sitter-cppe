@@ -428,6 +428,10 @@
     "named": true,
     "subtypes": [
       {
+        "type": "array_type",
+        "named": true
+      },
+      {
         "type": "class_specifier",
         "named": true
       },
@@ -756,6 +760,25 @@
       "types": [
         {
           "type": "type_qualifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "array_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "_type_specifier",
           "named": true
         }
       ]

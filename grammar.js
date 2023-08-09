@@ -64,7 +64,8 @@ module.exports = grammar(C, {
     [$._binary_fold_operator, $._fold_operator],
     [$.expression_statement, $.for_statement],
     [$.init_statement, $.for_statement],
-    [$._declaration_modifiers, $.type_descriptor]
+    [$._declaration_modifiers, $.type_descriptor],
+    [$.array_type, $.new_declarator],
   ]),
 
   inline: ($, original) => original.concat([
@@ -114,15 +115,24 @@ module.exports = grammar(C, {
       $._type_specifier
     )),
 
-    product_type: $ => choice(
-      // seq('(', commaSep1($.type_descriptor), ')'),
-      seq('<', commaSep1($.type_descriptor), '>')
-    ),
-    
+    product_type: $ => seq('<', commaSep1($.type_descriptor), '>'),
+
+    array_type: $ => prec.right(PREC.NEW - 1, seq(
+      $._type_specifier,
+      seq(
+        '[',
+        optional(choice(
+          '...',
+          $._expression
+        )),
+        ']'
+      )
+    )),
 
     _type_specifier: $ => choice(
       $.sum_type,
       $.product_type,
+      $.array_type,
       $.struct_specifier,
       $.union_specifier,
       $.enum_specifier,
