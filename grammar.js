@@ -66,6 +66,7 @@ module.exports = grammar(C, {
     [$.init_statement, $.for_statement],
     [$._declaration_modifiers, $.type_descriptor],
     [$.array_type, $.new_declarator],
+    [$.call_expression],
   ]),
 
   inline: ($, original) => original.concat([
@@ -1025,10 +1026,12 @@ module.exports = grammar(C, {
     )),
 
 
-    call_expression: ($, original) => choice(original, seq(
-      field('function', $.primitive_type),
+    call_expression: $ => prec(PREC.CALL, seq(
+      field('function', choice($._expression, $.primitive_type)),
+      field("noufcs", optional($.noufcs)),
       field('arguments', $.argument_list),
     )),
+    noufcs: _ => seq('[[', 'noufcs', ']]'),
 
     co_await_expression: $ => prec.left(PREC.UNARY, seq(
       field('operator', $._await),
@@ -1061,21 +1064,21 @@ module.exports = grammar(C, {
       $._expression,
     ),
 
-    field_expression: ($, original) => choice(
-      original,
+    field_expression: $ => prec.left(PREC.FIELD, seq(
+      field('argument', $._expression),
       seq(
-        prec.left(PREC.FIELD, seq(
-          field('argument', $._expression),
-          choice('.', '->'),
-          optional('*')
-        )),
-        field('field', choice(
-          $.destructor_name,
-          $.template_method,
-          alias($.dependent_field_identifier, $.dependent_name),
-        )),
+        choice('.', '->'),
+        optional('*'),
       ),
-    ),
+      field("noufcs", optional($.noufcs)),
+      field('field', choice(
+        $._field_identifier,
+        $.destructor_name,
+        $.template_method,
+        alias($.dependent_field_identifier, $.dependent_name),
+        alias($.qualified_identifier, $.qualified_name),
+      )),
+    )),
 
     type_requirement: $ => seq('typename', $._class_name),
 
@@ -1279,7 +1282,7 @@ module.exports = grammar(C, {
       '::',
     )),
 
-    qualified_field_identifier: $ => seq(
+    qualified_field_identifier: $ => prec.left(seq(
       $._scope_resolution,
       field('name', choice(
         alias($.dependent_field_identifier, $.dependent_name),
@@ -1287,7 +1290,7 @@ module.exports = grammar(C, {
         $.template_method,
         $._field_identifier,
       )),
-    ),
+    )),
 
     qualified_identifier: $ => seq(
       $._scope_resolution,

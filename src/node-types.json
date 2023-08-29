@@ -1245,6 +1245,16 @@
             "named": true
           }
         ]
+      },
+      "noufcs": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "noufcs",
+            "named": true
+          }
+        ]
       }
     }
   },
@@ -2817,22 +2827,22 @@
             "named": true
           },
           {
+            "type": "qualified_name",
+            "named": true
+          },
+          {
             "type": "template_method",
             "named": true
           }
         ]
       },
-      "operator": {
+      "noufcs": {
         "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "->",
-            "named": false
-          },
-          {
-            "type": ".",
-            "named": false
+            "type": "noufcs",
+            "named": true
           }
         ]
       }
@@ -4059,6 +4069,11 @@
     }
   },
   {
+    "type": "noufcs",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "operator_cast",
     "named": true,
     "fields": {
@@ -5276,6 +5291,64 @@
           },
           {
             "type": "type_identifier",
+            "named": true
+          }
+        ]
+      },
+      "scope": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "decltype",
+            "named": true
+          },
+          {
+            "type": "dependent_name",
+            "named": true
+          },
+          {
+            "type": "namespace_identifier",
+            "named": true
+          },
+          {
+            "type": "template_type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "qualified_name",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "dependent_name",
+            "named": true
+          },
+          {
+            "type": "destructor_name",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "operator_name",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "template_function",
             "named": true
           }
         ]
@@ -7208,6 +7281,10 @@
   },
   {
     "type": "not_eq",
+    "named": false
+  },
+  {
+    "type": "noufcs",
     "named": false
   },
   {

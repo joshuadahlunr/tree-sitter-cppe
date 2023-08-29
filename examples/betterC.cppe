@@ -1,0 +1,17 @@
+void main(auto args) {
+	auto filename = args[1].data;
+
+	// Open the file for reading
+	auto file = filename.fopen("r");
+	defer file.fclose(); // Close the file (when we are finished)
+
+	// Check if the file was opened successfully
+	if (file == NULL)
+		return -"Failed to open the file %s\n".printf(filename);
+
+	// Read values from the file until the end is reached
+	int value; auto values = while (file.fscanf("%d", &value) != EOF) { value }; // TODO: initializer variable not in scope for loop body!
+	for(int value: values) "Read value: %d\n".printf(value);
+
+	;
+}

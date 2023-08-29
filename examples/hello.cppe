@@ -1,10 +1,13 @@
 
 fn main(std::vector<std::string> args) {
 	for(auto& arg: args)
-        std::cout << "arg: " << arg << std::endl;
+		std::cout << "arg: " << arg << std::endl;
+
+	std::variant<int, std::string> var = 20; 
+	std::cout << var.std::get<int> << std::endl;
 
 	std::vector<std::string_view> worlds <- {"world", "世界"};
-	defer if(not worlds.empty())
+	defer if(not worlds.empty)
 			worlds.clear();
 		else if(worlds.empty()) {}
 
@@ -12,6 +15,9 @@ fn main(std::vector<std::string> args) {
 		yield 0;
 	else { 5 };
 	std::cout << ifVal << std::endl;
+
+	auto test = if(false) { 7 }.value_or(-1);
+	std::cout << "test: " << test << std::endl;
 
 	for(int x = 0; x < 7; x++)
 		std::cout << x << std::endl;
@@ -64,7 +70,7 @@ fn main(std::vector<std::string> args) {
 
 
 
-	std::function<void(int)> f2;
+	// std::function<void(int)> f2; // TODO: Why is this a call expression?
 	<void(int)>* fptr;
 
 	int[20] array;
@@ -75,4 +81,4 @@ fn main(std::vector<std::string> args) {
 	0
 }
 
-<int, <int | std::string>> f() => {1, 2}
+// <int, <int | std::string>> f() => {1, 2}
